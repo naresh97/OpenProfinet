@@ -1,4 +1,3 @@
-#include <iostream>
 #include "ProfinetTool.h"
 
 int main() {
