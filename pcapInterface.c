@@ -18,51 +18,6 @@ void getInterfaceMACAddress(const char interface[], uint8_t *MACAddress) {
     }
 }
 
-void discoveryRequest(const char interface[]) {
-    char pcap_errbuf[PCAP_ERRBUF_SIZE];
-    pcap_errbuf[0] = '\0';
-    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 0, 0, pcap_errbuf);
-    if (pcap_errbuf[0] != '\0') {
-        fprintf(stderr, "%s", pcap_errbuf);
-    }
-    if (!pcap) {
-        exit(1);
-    }
-
-    struct ether_header header;
-    header.ether_type = htons(ETH_P_8021Q);
-
-    uint8_t hostMac[6];
-    getInterfaceMACAddress(interface, hostMac);
-    memcpy(header.ether_shost, hostMac, sizeof(hostMac));
-
-    uint8_t destMac[6] = {0x01, 0x0e, 0xcf, 0x00, 0x00, 0x00};;
-    memcpy(header.ether_dhost, destMac, sizeof(destMac));
-
-    uint8_t vlan_header[4] = {0x00, 0x00, 0x88, 0x92};
-
-    uint8_t profinet_header[16] = {0xfe, 0xfe,
-                                   0x05,
-                                   0x00,
-                                   0x00, 0x00, 0x00, 0x03,
-                                   0x00, 0x01,
-                                   0x00, 0x04,
-                                   0xff, 0xff, 0x00, 0x00};
-
-    unsigned char request[sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header)];
-    memcpy(request, &header, sizeof(header));
-    memcpy(request + sizeof(header), &vlan_header, sizeof(vlan_header));
-    memcpy(request + sizeof(header) + sizeof(vlan_header), &profinet_header, sizeof(profinet_header));
-
-    if (pcap_inject(pcap, &request, sizeof(request)) == -1) {
-        pcap_perror(pcap, 0);
-        pcap_close(pcap);
-        exit(1);
-    }
-
-    pcap_close(pcap);
-}
-
 void printBytes(unsigned char *pointer, unsigned long length) {
     for (int i = 0; i < length; ++i) {
         printf("%02X ", pointer[i]);
@@ -153,6 +108,51 @@ void profinetCallback(unsigned char *args, const struct pcap_pkthdr *packetInfo,
     profinetPacketArray->size++;
 
     count++;
+}
+
+void discoveryRequest(const char interface[]) {
+    char pcap_errbuf[PCAP_ERRBUF_SIZE];
+    pcap_errbuf[0] = '\0';
+    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 0, 0, pcap_errbuf);
+    if (pcap_errbuf[0] != '\0') {
+        fprintf(stderr, "%s", pcap_errbuf);
+    }
+    if (!pcap) {
+        exit(1);
+    }
+
+    struct ether_header header;
+    header.ether_type = htons(ETH_P_8021Q);
+
+    uint8_t hostMac[6];
+    getInterfaceMACAddress(interface, hostMac);
+    memcpy(header.ether_shost, hostMac, sizeof(hostMac));
+
+    uint8_t destMac[6] = {0x01, 0x0e, 0xcf, 0x00, 0x00, 0x00};
+    memcpy(header.ether_dhost, destMac, sizeof(destMac));
+
+    uint8_t vlan_header[4] = {0x00, 0x00, 0x88, 0x92};
+
+    uint8_t profinet_header[16] = {0xfe, 0xfe,
+                                   0x05,
+                                   0x00,
+                                   0x00, 0x00, 0x00, 0x03,
+                                   0x00, 0x01,
+                                   0x00, 0x04,
+                                   0xff, 0xff, 0x00, 0x00};
+
+    unsigned char request[sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header)];
+    memcpy(request, &header, sizeof(header));
+    memcpy(request + sizeof(header), &vlan_header, sizeof(vlan_header));
+    memcpy(request + sizeof(header) + sizeof(vlan_header), &profinet_header, sizeof(profinet_header));
+
+    if (pcap_inject(pcap, &request, sizeof(request)) == -1) {
+        pcap_perror(pcap, 0);
+        pcap_close(pcap);
+        exit(1);
+    }
+
+    pcap_close(pcap);
 }
 
 void profinetListen(const char interface[], struct profinet_packet_array *profinetPacketArray) {
