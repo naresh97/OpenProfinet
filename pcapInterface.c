@@ -110,7 +110,15 @@ void profinetCallback(unsigned char *args, const struct pcap_pkthdr *packetInfo,
     count++;
 }
 
-void discoveryRequest(const char interface[]) {
+void get_default_interface(char *interface) {
+    char pcap_errbuf[PCAP_ERRBUF_SIZE];
+    pcap_errbuf[0] = '\0';
+    pcap_if_t *interfaces;
+    if (pcap_findalldevs(&interfaces, pcap_errbuf) == 0)
+        strcpy(interface, interfaces->name);
+}
+
+void discovery_request(const char interface[]) {
     char pcap_errbuf[PCAP_ERRBUF_SIZE];
     pcap_errbuf[0] = '\0';
     pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 0, 0, pcap_errbuf);
@@ -155,11 +163,11 @@ void discoveryRequest(const char interface[]) {
     pcap_close(pcap);
 }
 
-void profinetListen(const char interface[], struct profinet_packet_array *profinetPacketArray) {
+void profinet_listen(const char interface[], struct profinet_packet_array *profinetPacketArray, int timeout) {
     char pcap_errbuf[PCAP_ERRBUF_SIZE];
     pcap_errbuf[0] = '\0';
-    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 1, 10000, pcap_errbuf);
 
+    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 1, timeout, pcap_errbuf);
     if (pcap_errbuf[0] != '\0') {
         fprintf(stderr, "%s", pcap_errbuf);
     }
@@ -167,13 +175,13 @@ void profinetListen(const char interface[], struct profinet_packet_array *profin
         exit(1);
     }
 
-    pcap_dispatch(pcap, -1, &profinetCallback, (unsigned char *) profinetPacketArray);
+    pcap_dispatch(pcap, 0, &profinetCallback, (unsigned char *) profinetPacketArray);
 
     pcap_close(pcap);
 }
 
-void getProfinetDevices(struct profinet_packet_array *profinetPacketArray, struct profinet_device *profinetDevices,
-                        int *count) {
+void get_profinet_devices(struct profinet_packet_array *profinetPacketArray, struct profinet_device *profinetDevices,
+                          int *count) {
     struct profinet_device deviceList[PROFINET_DEVICE_LIST_SIZE];
     int deviceCount = 0;
 

@@ -12,6 +12,12 @@ extern "C"{
 #include "pcapInterface.h"
 }
 
+std::string getDefaultInterface(){
+    char interface[256];
+    get_default_interface(interface);
+    return interface;
+}
+
 std::string MACToString(std::array<uint8_t, 6> mac){
     char macStr[18];
     snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X",
@@ -24,7 +30,7 @@ std::vector<ProfinetDevice> getDevicesFromPackets(profinet_packet_array profinet
     int count;
 
     std::vector<ProfinetDevice> devicesVector;
-    getProfinetDevices(&profinetPacketArray, devices, &count);
+    get_profinet_devices(&profinetPacketArray, devices, &count);
     for(int i = 0; i < count; ++i){
         auto device = devices[i];
         char ipAddress[INET_ADDRSTRLEN];
@@ -51,11 +57,12 @@ std::vector<ProfinetDevice> getDevicesFromPackets(profinet_packet_array profinet
 void ProfinetTool::searchForDevices() {
     profinet_packet_array profinetPacketArray{};
     auto listeningThread = std::thread([this, &profinetPacketArray](){
-        profinetListen(interface.c_str(), &profinetPacketArray);
+        profinet_listen(interface.c_str(), &profinetPacketArray, searchTimeout);
     });
 
-    discoveryRequest(interface.c_str());
+    discovery_request(interface.c_str());
 
+    std::cout << "Searching..." << std::endl;
     listeningThread.join();
 
     auto devices = getDevicesFromPackets(profinetPacketArray);
@@ -66,4 +73,8 @@ void ProfinetTool::searchForDevices() {
     }
 }
 
-ProfinetTool::ProfinetTool(const std::string &interface) : interface(interface) {}
+ProfinetTool::ProfinetTool(const std::string &interface, int timeout) : interface(interface), searchTimeout(timeout) {}
+
+ProfinetTool::ProfinetTool(int timeout) : interface(getDefaultInterface()), searchTimeout(timeout) {
+    std::cout << "Using default interface: " << getDefaultInterface() << std::endl;
+}

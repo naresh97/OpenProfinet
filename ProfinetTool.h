@@ -20,12 +20,15 @@ struct ProfinetDevice{
 
 class ProfinetTool {
 public:
-    explicit ProfinetTool(const std::string &interface);
+    explicit ProfinetTool(int timeout = 5000);
+    ProfinetTool(const std::string &interface, int timeout);
+
     void searchForDevices();
     void setDeviceProperties();
 
 private:
     std::string interface;
+    int searchTimeout;
 };
 
 

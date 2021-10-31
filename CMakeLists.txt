@@ -5,6 +5,10 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(Threads REQUIRED)
 
-add_executable(OpenProfinet main.cpp pcapInterface.c ProfinetTool.cpp)
+include_directories(include)
 
-target_link_libraries(OpenProfinet pcap Threads::Threads)
+add_executable(pntool main.cpp pcapInterface.c ProfinetTool.cpp)
+
+target_link_libraries(pntool pcap Threads::Threads)
+
+# set(CPACK_DEBIAN_PACKAGE_DEPENDS "")

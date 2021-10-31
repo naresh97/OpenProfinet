@@ -12,11 +12,13 @@
 #include <slcurses.h>
 #include "profinetTypes.h"
 
-void discoveryRequest(const char interface[]);
+void get_default_interface(char *interface);
 
-void profinetListen(const char interface[], struct profinet_packet_array *profinetPacketArray);
+void discovery_request(const char interface[]);
 
-void getProfinetDevices(struct profinet_packet_array *profinetPacketArray, struct profinet_device *profinetDevices,
-                        int *count);
+void profinet_listen(const char interface[], struct profinet_packet_array *profinetPacketArray, int timeout);
+
+void get_profinet_devices(struct profinet_packet_array *profinetPacketArray, struct profinet_device *profinetDevices,
+                          int *count);
 
 #endif //OPENPROFINET_PCAPINTERFACE_H
