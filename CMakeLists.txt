@@ -7,7 +7,7 @@ find_package(Threads REQUIRED)
 
 include_directories(include)
 
-add_executable(pntool main.cpp pcapInterface.c ProfinetTool.cpp)
+add_executable(pntool src/main.cpp src/pcapInterface.c src/ProfinetTool.cpp)
 
 target_link_libraries(pntool pcap Threads::Threads)
 
