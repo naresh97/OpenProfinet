@@ -7,6 +7,14 @@
 #include <memory.h>
 #include <sys/ioctl.h>
 #include <linux/if.h>
+#include <pthread.h>
+#include <unistd.h>
+
+#define DCP_BLOCK_IDENTIFY_SELECT_ALL {0xff, 0xff, 0x00, 0x00}
+#define DEST_MAC_MULTICAST {0x01, 0x0e, 0xcf, 0x00, 0x00, 0x00}
+#define VLAN_HEADER {0x00, 0x00, 0x88, 0x92}
+
+#define DCP_BLOCK_CONTROL_END_TRANSACTION {0x05, 0x02, 0x00, 0x02, 0x00, 0x01}
 
 void getInterfaceMACAddress(const char interface[], uint8_t *MACAddress) {
     struct ifreq s;
@@ -62,7 +70,7 @@ struct profinet_device getIdentifyResponse(const unsigned char *blocks, size_t b
     getDCPBlocks(blocks, blocksLength, processBlocks, &numberOfBlocks);
     for (int i = 0; i < numberOfBlocks; ++i) {
         if (processBlocks[i].header.option == 2 && processBlocks[i].header.subOption == 2) {
-            memcpy(response.stationName, processBlocks[i].data, processBlocks[i].dataLength);
+            memcpy(response.deviceName, processBlocks[i].data, processBlocks[i].dataLength);
         } else if (processBlocks[i].header.option == 1 && processBlocks[i].header.subOption == 2) {
             memcpy(&response.ipAddress, processBlocks[i].data, sizeof(in_addr_t));
             memcpy(&response.subnetMask, processBlocks[i].data + sizeof(in_addr_t), sizeof(in_addr_t));
@@ -136,23 +144,26 @@ void discovery_request(const char interface[]) {
     getInterfaceMACAddress(interface, hostMac);
     memcpy(header.ether_shost, hostMac, sizeof(hostMac));
 
-    uint8_t destMac[6] = {0x01, 0x0e, 0xcf, 0x00, 0x00, 0x00};
+    uint8_t destMac[6] = DEST_MAC_MULTICAST;
     memcpy(header.ether_dhost, destMac, sizeof(destMac));
 
-    uint8_t vlan_header[4] = {0x00, 0x00, 0x88, 0x92};
+    uint8_t vlan_header[4] = VLAN_HEADER;
 
-    uint8_t profinet_header[16] = {0xfe, 0xfe,
-                                   0x05,
-                                   0x00,
-                                   0x00, 0x00, 0x00, 0x03,
-                                   0x00, 0x01,
-                                   0x00, 0x04,
-                                   0xff, 0xff, 0x00, 0x00};
+    uint8_t blockData[4] = DCP_BLOCK_IDENTIFY_SELECT_ALL;
+    struct profinet_dcp_header profinet_header = {
+            .frameId = 0xfefe,
+            .serviceId = 5,
+            .serviceType = 0,
+            .transactionId = htonl(1),
+            .responseDelay = htons(1),
+            .dataLength = htons(sizeof(blockData)),
+    };
 
-    unsigned char request[sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header)];
+    unsigned char request[sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header) + sizeof(blockData)];
     memcpy(request, &header, sizeof(header));
     memcpy(request + sizeof(header), &vlan_header, sizeof(vlan_header));
     memcpy(request + sizeof(header) + sizeof(vlan_header), &profinet_header, sizeof(profinet_header));
+    memcpy(request + sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header), blockData, sizeof(blockData));
 
     if (pcap_inject(pcap, &request, sizeof(request)) == -1) {
         pcap_perror(pcap, 0);
@@ -163,11 +174,12 @@ void discovery_request(const char interface[]) {
     pcap_close(pcap);
 }
 
+
 void profinet_listen(const char interface[], struct profinet_packet_array *profinetPacketArray, int timeout) {
     char pcap_errbuf[PCAP_ERRBUF_SIZE];
     pcap_errbuf[0] = '\0';
 
-    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 1, timeout, pcap_errbuf);
+    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 1, 1000, pcap_errbuf);
     if (pcap_errbuf[0] != '\0') {
         fprintf(stderr, "%s", pcap_errbuf);
     }
@@ -175,7 +187,12 @@ void profinet_listen(const char interface[], struct profinet_packet_array *profi
         exit(1);
     }
 
-    pcap_dispatch(pcap, 0, &profinetCallback, (unsigned char *) profinetPacketArray);
+    time_t start = time(NULL);
+    time_t end = start + (timeout / 1000);
+
+    while(time(NULL) < end){
+        pcap_dispatch(pcap, 0, &profinetCallback, (unsigned char *) profinetPacketArray);
+    }
 
     pcap_close(pcap);
 }
@@ -199,4 +216,140 @@ void get_profinet_devices(struct profinet_packet_array *profinetPacketArray, str
 
     memcpy(profinetDevices, deviceList, sizeof(deviceList));
     *count = deviceCount;
+}
+
+void set_device_ip_block(const char interface[], struct profinet_device *device){
+    char pcap_errbuf[PCAP_ERRBUF_SIZE];
+    pcap_errbuf[0] = '\0';
+    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 0, 0, pcap_errbuf);
+    if (pcap_errbuf[0] != '\0') {
+        fprintf(stderr, "%s", pcap_errbuf);
+    }
+    if (!pcap) {
+        exit(1);
+    }
+
+    struct ether_header header;
+    header.ether_type = htons(ETH_P_8021Q);
+
+    uint8_t hostMac[6];
+    getInterfaceMACAddress(interface, hostMac);
+    memcpy(header.ether_shost, hostMac, sizeof(hostMac));
+
+    memcpy(header.ether_dhost, device->macAddress, sizeof(device->macAddress));
+
+    uint8_t vlan_header[4] = VLAN_HEADER;
+
+    struct profinet_dcp_block_ip_s ipBlock;
+    ipBlock.option = 1;
+    ipBlock.suboption = 2;
+    ipBlock.length = htons(14);
+    ipBlock.qualifier = 0;
+    memcpy(&ipBlock.ip_address, &device->ipAddress, sizeof(ipBlock.ip_address));
+    memcpy(&ipBlock.subnet_mask, &device->subnetMask, sizeof(ipBlock.subnet_mask));
+    memcpy(&ipBlock.standard_gateway, &device->gateway, sizeof(ipBlock.standard_gateway));
+
+    uint8_t endBlock[6] = DCP_BLOCK_CONTROL_END_TRANSACTION;
+
+    uint8_t blockData[ sizeof(ipBlock) + sizeof(endBlock) ];
+    memcpy(blockData, &ipBlock, sizeof(ipBlock));
+    memcpy(blockData + sizeof(ipBlock), endBlock, sizeof(endBlock));
+
+    struct profinet_dcp_header profinet_header = {
+            .frameId = htons(0xfefd),
+            .serviceId = 4,
+            .serviceType = 0,
+            .transactionId = htonl(2),
+            .responseDelay = htons(0),
+            .dataLength = htons(sizeof(blockData)),
+    };
+
+    unsigned char request[sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header) + sizeof(blockData)];
+    memcpy(request, &header, sizeof(header));
+    memcpy(request + sizeof(header), &vlan_header, sizeof(vlan_header));
+    memcpy(request + sizeof(header) + sizeof(vlan_header), &profinet_header, sizeof(profinet_header));
+    memcpy(request + sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header), blockData, sizeof(blockData));
+
+    int injectRet = pcap_inject(pcap, request, sizeof(request));
+    if (injectRet == -1) {
+        pcap_perror(pcap, 0);
+        pcap_close(pcap);
+        exit(1);
+    }
+
+    pcap_close(pcap);
+}
+
+void set_device_name_block(const char interface[], struct profinet_device *device) {
+    char pcap_errbuf[PCAP_ERRBUF_SIZE];
+    pcap_errbuf[0] = '\0';
+    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 0, 0, pcap_errbuf);
+    if (pcap_errbuf[0] != '\0') {
+        fprintf(stderr, "%s", pcap_errbuf);
+    }
+    if (!pcap) {
+        exit(1);
+    }
+
+    struct ether_header header;
+    header.ether_type = htons(ETH_P_8021Q);
+
+    uint8_t hostMac[6];
+    getInterfaceMACAddress(interface, hostMac);
+    memcpy(header.ether_shost, hostMac, sizeof(hostMac));
+
+    memcpy(header.ether_dhost, device->macAddress, sizeof(device->macAddress));
+
+    uint8_t vlan_header[4] = VLAN_HEADER;
+
+    size_t sizeToPad;
+    if(strlen(device->deviceName) % 2 == 0) sizeToPad = 0;
+    else sizeToPad = 1;
+
+    uint8_t nameBlock[6 + strlen(device->deviceName) + sizeToPad];
+    uint8_t namePreBlock[6] = {
+            2,
+            2
+    };
+    uint16_t nameBlockLength = htons(strlen(device->deviceName) + 2);
+    memcpy(namePreBlock + 2, &nameBlockLength, 2);
+    memset(namePreBlock + 4, 0x0000, 1);
+    memcpy(nameBlock, namePreBlock, 6);
+    memcpy(nameBlock + 6, device->deviceName, strlen(device->deviceName));
+    memset(nameBlock + 6 + strlen(device->deviceName), 0, 1);
+
+    uint8_t endBlock[6] = DCP_BLOCK_CONTROL_END_TRANSACTION;
+
+    uint8_t blockData[ sizeof(nameBlock) + sizeof(endBlock) ];
+    memcpy(blockData, nameBlock, sizeof(nameBlock));
+    memcpy(blockData + sizeof(nameBlock), endBlock, sizeof(endBlock));
+
+    struct profinet_dcp_header profinet_header = {
+            .frameId = htons(0xfefd),
+            .serviceId = 4,
+            .serviceType = 0,
+            .transactionId = htonl(2),
+            .responseDelay = htons(0),
+            .dataLength = htons(sizeof(blockData)),
+    };
+
+    unsigned char request[sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header) + sizeof(blockData)];
+    memcpy(request, &header, sizeof(header));
+    memcpy(request + sizeof(header), &vlan_header, sizeof(vlan_header));
+    memcpy(request + sizeof(header) + sizeof(vlan_header), &profinet_header, sizeof(profinet_header));
+    memcpy(request + sizeof(header) + sizeof(vlan_header) + sizeof(profinet_header), blockData, sizeof(blockData));
+
+    int injectRet = pcap_inject(pcap, request, sizeof(request));
+    if (injectRet == -1) {
+        pcap_perror(pcap, 0);
+        pcap_close(pcap);
+        exit(1);
+    }
+
+    pcap_close(pcap);
+}
+
+void set_device_configuration(const char *interface, struct profinet_device *device) {
+    set_device_ip_block(interface, device);
+    set_device_name_block(interface, device);
 }

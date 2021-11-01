@@ -6,6 +6,8 @@
 
 #include <thread>
 #include <iostream>
+#include <utility>
+#include <cstring>
 #include "ProfinetTool.h"
 
 extern "C"{
@@ -41,7 +43,7 @@ std::vector<ProfinetDevice> getDevicesFromPackets(profinet_packet_array profinet
         inet_ntop(AF_INET, &device.gateway, gateway, INET_ADDRSTRLEN);
 
         ProfinetDevice newDevice{
-            .deviceName = device.stationName,
+            .deviceName = device.deviceName,
             .deviceType = device.deviceType,
             .ipAddress = ipAddress,
             .subnetMask = subnet,
@@ -54,23 +56,68 @@ std::vector<ProfinetDevice> getDevicesFromPackets(profinet_packet_array profinet
     return devicesVector;
 }
 
-void ProfinetTool::searchForDevices() {
-    profinet_packet_array profinetPacketArray{};
-    auto listeningThread = std::thread([this, &profinetPacketArray](){
+std::thread ProfinetTool::listenForPackets() {
+    auto listeningThread = std::thread([this](){
         profinet_listen(interface.c_str(), &profinetPacketArray, searchTimeout);
     });
 
+    return listeningThread;
+}
+
+std::vector<ProfinetDevice> ProfinetTool::searchForDevices() {
+    auto listeningThread = listenForPackets();
+
     discovery_request(interface.c_str());
 
-    std::cout << "Searching..." << std::endl;
+    std::cout << "Searching for devices..." << std::endl;
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(searchTimeout));
+
     listeningThread.join();
 
     auto devices = getDevicesFromPackets(profinetPacketArray);
+
     for(const auto &device : devices){
         using namespace std;
         cout << "Device Name: " << device.deviceName << " - IP: " << device.ipAddress << ", Subnet Mask: " << device.subnetMask
              << ", Gateway: " << device.gateway << ", Type: " << device.deviceType << endl;
     }
+
+    //std::cout << devices.size() << " devices found. " << std::endl;
+
+    return devices;
+}
+
+void ProfinetTool::configureDevices(const std::string &deviceName, const std::string &newName, const std::string &newIP,
+                                    const std::string &newSubnet, const std::string &newGateway) {
+    auto devices = searchForDevices();
+
+    ProfinetDevice device;
+    bool found = false;
+    for(auto const &loopDevice : devices){
+        if(loopDevice.deviceName == deviceName){
+            found = true;
+            device = loopDevice;
+            break;
+        }
+    }
+
+    if(!found) throw std::runtime_error("Device does not exist on network.");
+
+    if(!newName.empty()) device.deviceName = newName;
+    if(!newIP.empty()) device.ipAddress = newIP;
+    if(!newSubnet.empty()) device.subnetMask = newSubnet;
+    if(!newGateway.empty()) device.gateway =  newGateway;
+
+    profinet_device device_p{};
+    strcpy(device_p.deviceName, device.deviceName.c_str());
+    strcpy(device_p.deviceType, device.deviceType.c_str());
+    memcpy(device_p.macAddress, device.deviceMAC.data(), 6);
+    inet_pton(AF_INET, device.ipAddress.c_str(), &device_p.ipAddress);
+    inet_pton(AF_INET, device.subnetMask.c_str(), &device_p.subnetMask);
+    inet_pton(AF_INET, device.gateway.c_str(), &device_p.gateway);
+
+    set_device_configuration(interface.c_str(), &device_p);
 }
 
 ProfinetTool::ProfinetTool(const std::string &interface, int timeout) : interface(interface), searchTimeout(timeout) {}
