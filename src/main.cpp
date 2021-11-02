@@ -40,6 +40,7 @@ int main(int argc, char **argv) {
         }
     } catch (const std::runtime_error &e) {
         std::cerr << "Could not run command: " << e.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
 
