@@ -8,8 +8,10 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <thread>
+#include "profinetTypes.h"
 
-struct ProfinetDevice{
+struct ProfinetDevice {
     std::string deviceName;
     std::string deviceType;
     std::string ipAddress;
@@ -21,14 +23,22 @@ struct ProfinetDevice{
 class ProfinetTool {
 public:
     explicit ProfinetTool(int timeout = 5000);
+
     ProfinetTool(const std::string &interface, int timeout);
 
-    void searchForDevices();
-    void setDeviceProperties();
+    // Commands
+    std::vector<ProfinetDevice> searchForDevices(bool printFoundDevices = true);
+
+    void configureDevices(const std::string &deviceName, const std::string &newName, const std::string &newIP,
+                          const std::string &newSubnet, const std::string &newGateway);
 
 private:
+    std::thread listenForPackets();
+
     std::string interface;
     int searchTimeout;
+
+    profinet_packet_array profinetPacketArray{};
 };
 
 
