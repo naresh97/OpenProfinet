@@ -24,5 +24,5 @@ set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "
 OpenProfinet is a collection of tools for working with Profinet on Linux
 https://github.com/naresh97/OpenProfinet
 ")
-set(CPACK_DEBIAN_FILE_NAME OpenProfinet-${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}-${CMAKE_PROJECT_VERSION_PATCH}.deb)
+set(CPACK_DEBIAN_FILE_NAME OpenProfinet-${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH}.deb)
 include(CPack)
