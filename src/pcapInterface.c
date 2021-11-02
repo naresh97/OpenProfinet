@@ -84,8 +84,6 @@ struct profinet_device getIdentifyResponse(const unsigned char *blocks, size_t b
 }
 
 void profinet_pcap_callback(unsigned char *args, const struct pcap_pkthdr *packetInfo, const unsigned char *packet) {
-    static int count = 0;
-
     struct ether_header header;
     memcpy(&header, packet, sizeof(header));
 
@@ -114,8 +112,6 @@ void profinet_pcap_callback(unsigned char *args, const struct pcap_pkthdr *packe
 
     profinetPacketArray->packets[profinetPacketArray->size] = profinetPacket;
     profinetPacketArray->size++;
-
-    count++;
 }
 
 void get_default_interface(char *interface) {
@@ -190,7 +186,7 @@ void profinet_listen(const char interface[], struct profinet_packet_array *profi
     time_t start = time(NULL);
     time_t current = start;
 
-    while(current - start <= (timeout/1000)){
+    while (current - start <= (timeout / 1000)) {
         pcap_dispatch(pcap, 0, &profinet_pcap_callback, (unsigned char *) profinetPacketArray);
         current = time(NULL);
     }
@@ -219,7 +215,7 @@ void get_profinet_devices(struct profinet_packet_array *profinetPacketArray, str
     *count = deviceCount;
 }
 
-void set_device_ip_block(const char interface[], struct profinet_device *device){
+void set_device_ip_block(const char interface[], struct profinet_device *device) {
     char pcap_errbuf[PCAP_ERRBUF_SIZE];
     pcap_errbuf[0] = '\0';
     pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 0, 0, pcap_errbuf);
@@ -252,7 +248,7 @@ void set_device_ip_block(const char interface[], struct profinet_device *device)
 
     uint8_t endBlock[6] = DCP_BLOCK_CONTROL_END_TRANSACTION;
 
-    uint8_t blockData[ sizeof(ipBlock) + sizeof(endBlock) ];
+    uint8_t blockData[sizeof(ipBlock) + sizeof(endBlock)];
     memcpy(blockData, &ipBlock, sizeof(ipBlock));
     memcpy(blockData + sizeof(ipBlock), endBlock, sizeof(endBlock));
 
@@ -304,7 +300,7 @@ void set_device_name_block(const char interface[], struct profinet_device *devic
     uint8_t vlan_header[4] = VLAN_HEADER;
 
     size_t sizeToPad;
-    if(strlen(device->deviceName) % 2 == 0) sizeToPad = 0;
+    if (strlen(device->deviceName) % 2 == 0) sizeToPad = 0;
     else sizeToPad = 1;
 
     uint8_t nameBlock[6 + strlen(device->deviceName) + sizeToPad];
@@ -321,7 +317,7 @@ void set_device_name_block(const char interface[], struct profinet_device *devic
 
     uint8_t endBlock[6] = DCP_BLOCK_CONTROL_END_TRANSACTION;
 
-    uint8_t blockData[ sizeof(nameBlock) + sizeof(endBlock) ];
+    uint8_t blockData[sizeof(nameBlock) + sizeof(endBlock)];
     memcpy(blockData, nameBlock, sizeof(nameBlock));
     memcpy(blockData + sizeof(nameBlock), endBlock, sizeof(endBlock));
 
@@ -350,23 +346,23 @@ void set_device_name_block(const char interface[], struct profinet_device *devic
     pcap_close(pcap);
 }
 
-struct profinet_listen_thread_args{
+struct profinet_listen_thread_args {
     char interface[256];
     struct profinet_packet_array *profinetPacketArray;
     int timeout;
 };
 
-void *profinet_listen_thread(void *args){
+void *profinet_listen_thread(void *args) {
     struct profinet_listen_thread_args *profinet_args = args;
     profinet_listen(profinet_args->interface, profinet_args->profinetPacketArray, profinet_args->timeout);
 }
 
 int check_configuration_response(struct profinet_packet_array *profinetPacketArray, const uint8_t deviceMACAddress[6]) {
     int count = 0;
-    for(int i = 0; i < profinetPacketArray->size; i++){
+    for (int i = 0; i < profinetPacketArray->size; i++) {
         struct profinet_packet packet = profinetPacketArray->packets[i];
-        if(memcmp(packet.sourceMACAddress, deviceMACAddress, 6) != 0) continue;
-        if(packet.dcpHeader.serviceId == 4 && packet.dcpHeader.serviceType == 1) count++;
+        if (memcmp(packet.sourceMACAddress, deviceMACAddress, 6) != 0) continue;
+        if (packet.dcpHeader.serviceId == 4 && packet.dcpHeader.serviceType == 1) count++;
     }
     return count;
 }
@@ -391,6 +387,6 @@ bool set_device_configuration(const char *interface, struct profinet_device *dev
 
     pthread_join(listening_thread, NULL);
 
-    if(check_configuration_response(&profinetPacketArray, device->macAddress) == 2) return true;
+    if (check_configuration_response(&profinetPacketArray, device->macAddress) == 2) return true;
     else return false;
 }

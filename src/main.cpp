@@ -28,17 +28,17 @@ int main(int argc, char **argv) {
 
     CLI11_PARSE(app, argc, argv);
 
-    try{
-        if(*search){
+    try {
+        if (*search) {
             ProfinetTool profinetTool(timeout);
-            if(!interface->empty()) profinetTool = ProfinetTool(interface->as<std::string>(), timeout);
+            if (!interface->empty()) profinetTool = ProfinetTool(interface->as<std::string>(), timeout);
             profinetTool.searchForDevices();
-        }else if(*configure){
+        } else if (*configure) {
             ProfinetTool profinetTool(timeout);
             profinetTool.configureDevices(device->as<std::string>(), newName, newIP, newSubnet,
                                           newGateway);
         }
-    }catch(const std::runtime_error &e){
+    } catch (const std::runtime_error &e) {
         std::cerr << "Could not run command: " << e.what() << std::endl;
     }
 
