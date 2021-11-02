@@ -11,6 +11,7 @@
 
 extern "C" {
 #include "pcapInterface.h"
+#include <arpa/inet.h>
 }
 
 #define LISTENING_THREAD_STARTUP_DELAY 500
