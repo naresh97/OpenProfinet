@@ -83,7 +83,7 @@ struct profinet_device getIdentifyResponse(const unsigned char *blocks, size_t b
     return response;
 }
 
-void profinetCallback(unsigned char *args, const struct pcap_pkthdr *packetInfo, const unsigned char *packet) {
+void profinet_pcap_callback(unsigned char *args, const struct pcap_pkthdr *packetInfo, const unsigned char *packet) {
     static int count = 0;
 
     struct ether_header header;
@@ -112,7 +112,7 @@ void profinetCallback(unsigned char *args, const struct pcap_pkthdr *packetInfo,
 
     struct profinet_packet_array *profinetPacketArray = (struct profinet_packet_array *) args;
 
-    profinetPacketArray->packets[count] = profinetPacket;
+    profinetPacketArray->packets[profinetPacketArray->size] = profinetPacket;
     profinetPacketArray->size++;
 
     count++;
@@ -179,7 +179,7 @@ void profinet_listen(const char interface[], struct profinet_packet_array *profi
     char pcap_errbuf[PCAP_ERRBUF_SIZE];
     pcap_errbuf[0] = '\0';
 
-    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 1, 1000, pcap_errbuf);
+    pcap_t *pcap = pcap_open_live(interface, BUFSIZ, 1, 200, pcap_errbuf);
     if (pcap_errbuf[0] != '\0') {
         fprintf(stderr, "%s", pcap_errbuf);
     }
@@ -188,10 +188,11 @@ void profinet_listen(const char interface[], struct profinet_packet_array *profi
     }
 
     time_t start = time(NULL);
-    time_t end = start + (timeout / 1000);
+    time_t current = start;
 
-    while(time(NULL) < end){
-        pcap_dispatch(pcap, 0, &profinetCallback, (unsigned char *) profinetPacketArray);
+    while(current - start <= (timeout/1000)){
+        pcap_dispatch(pcap, 0, &profinet_pcap_callback, (unsigned char *) profinetPacketArray);
+        current = time(NULL);
     }
 
     pcap_close(pcap);
@@ -349,7 +350,47 @@ void set_device_name_block(const char interface[], struct profinet_device *devic
     pcap_close(pcap);
 }
 
-void set_device_configuration(const char *interface, struct profinet_device *device) {
+struct profinet_listen_thread_args{
+    char interface[256];
+    struct profinet_packet_array *profinetPacketArray;
+    int timeout;
+};
+
+void *profinet_listen_thread(void *args){
+    struct profinet_listen_thread_args *profinet_args = args;
+    profinet_listen(profinet_args->interface, profinet_args->profinetPacketArray, profinet_args->timeout);
+}
+
+int check_configuration_response(struct profinet_packet_array *profinetPacketArray, const uint8_t deviceMACAddress[6]) {
+    int count = 0;
+    for(int i = 0; i < profinetPacketArray->size; i++){
+        struct profinet_packet packet = profinetPacketArray->packets[i];
+        if(memcmp(packet.sourceMACAddress, deviceMACAddress, 6) != 0) continue;
+        if(packet.dcpHeader.serviceId == 4 && packet.dcpHeader.serviceType == 1) count++;
+    }
+    return count;
+}
+
+bool set_device_configuration(const char *interface, struct profinet_device *device) {
+    struct profinet_packet_array profinetPacketArray = {
+            .packets = {},
+            .size = 0,
+    };
+    struct profinet_listen_thread_args args = {
+            .profinetPacketArray = &profinetPacketArray,
+            .timeout = 1000,
+    };
+    strcpy(args.interface, interface);
+
+    pthread_t listening_thread;
+    pthread_create(&listening_thread, NULL, profinet_listen_thread, &args);
+    sleep(1);
+
     set_device_ip_block(interface, device);
     set_device_name_block(interface, device);
+
+    pthread_join(listening_thread, NULL);
+
+    if(check_configuration_response(&profinetPacketArray, device->macAddress) == 2) return true;
+    else return false;
 }

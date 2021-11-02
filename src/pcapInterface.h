@@ -9,7 +9,7 @@
 
 #include <pcap/pcap.h>
 #include <stdlib.h>
-#include <slcurses.h>
+#include <stdbool.h>
 #include "profinetTypes.h"
 
 void get_default_interface(char *interface);
@@ -21,6 +21,6 @@ void profinet_listen(const char interface[], struct profinet_packet_array *profi
 void get_profinet_devices(struct profinet_packet_array *profinetPacketArray, struct profinet_device *profinetDevices,
                           int *count);
 
-void set_device_configuration(const char interface[], struct profinet_device *device);
+bool set_device_configuration(const char *interface, struct profinet_device *device);
 
 #endif //OPENPROFINET_PCAPINTERFACE_H

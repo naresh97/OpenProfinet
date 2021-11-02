@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
 
     CLI::App *search = app.add_subcommand("search", "Search for Profinet devices on the network.");
     CLI::Option *interface = search->add_option("-i,--interface", "Interface to use");
-    int timeout = 2000;
+    int timeout = 1000;
     search->add_option("-t,--timeout", timeout, "Time to search for devices in milliseconds");
 
     CLI::App *configure = app.add_subcommand("configure", "Configure Profinet devices on the network.");

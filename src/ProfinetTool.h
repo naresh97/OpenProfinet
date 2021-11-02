@@ -26,7 +26,7 @@ public:
     ProfinetTool(const std::string &interface, int timeout);
 
     // Commands
-    std::vector<ProfinetDevice> searchForDevices();
+    std::vector<ProfinetDevice> searchForDevices(bool printFoundDevices = true);
     void configureDevices(const std::string &deviceName, const std::string &newName, const std::string &newIP,
                           const std::string &newSubnet, const std::string &newGateway);
 

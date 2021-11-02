@@ -6,13 +6,14 @@
 
 #include <thread>
 #include <iostream>
-#include <utility>
 #include <cstring>
 #include "ProfinetTool.h"
 
 extern "C"{
 #include "pcapInterface.h"
 }
+
+#define LISTENING_THREAD_STARTUP_DELAY 500
 
 std::string getDefaultInterface(){
     char interface[256];
@@ -60,37 +61,37 @@ std::thread ProfinetTool::listenForPackets() {
     auto listeningThread = std::thread([this](){
         profinet_listen(interface.c_str(), &profinetPacketArray, searchTimeout);
     });
-
+    std::this_thread::sleep_for(std::chrono::milliseconds(LISTENING_THREAD_STARTUP_DELAY));
     return listeningThread;
 }
 
-std::vector<ProfinetDevice> ProfinetTool::searchForDevices() {
+std::vector<ProfinetDevice> ProfinetTool::searchForDevices(bool printFoundDevices) {
+    profinetPacketArray = {.packets = {}, .size = 0};
+
     auto listeningThread = listenForPackets();
 
     discovery_request(interface.c_str());
 
     std::cout << "Searching for devices..." << std::endl;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(searchTimeout));
-
     listeningThread.join();
 
     auto devices = getDevicesFromPackets(profinetPacketArray);
 
-    for(const auto &device : devices){
-        using namespace std;
-        cout << "Device Name: " << device.deviceName << " - IP: " << device.ipAddress << ", Subnet Mask: " << device.subnetMask
-             << ", Gateway: " << device.gateway << ", Type: " << device.deviceType << endl;
+    if(printFoundDevices){
+        for(const auto &device : devices){
+            using namespace std;
+            cout << "Device Name: " << device.deviceName << " - IP: " << device.ipAddress << ", Subnet Mask: " << device.subnetMask
+                 << ", Gateway: " << device.gateway << ", Type: " << device.deviceType << endl;
+        }
     }
-
-    //std::cout << devices.size() << " devices found. " << std::endl;
 
     return devices;
 }
 
 void ProfinetTool::configureDevices(const std::string &deviceName, const std::string &newName, const std::string &newIP,
                                     const std::string &newSubnet, const std::string &newGateway) {
-    auto devices = searchForDevices();
+    auto devices = searchForDevices(false);
 
     ProfinetDevice device;
     bool found = false;
@@ -117,7 +118,9 @@ void ProfinetTool::configureDevices(const std::string &deviceName, const std::st
     inet_pton(AF_INET, device.subnetMask.c_str(), &device_p.subnetMask);
     inet_pton(AF_INET, device.gateway.c_str(), &device_p.gateway);
 
-    set_device_configuration(interface.c_str(), &device_p);
+    auto success = set_device_configuration(interface.c_str(), &device_p);
+    std::cout << "Device Configuration: " << (success ? "Success!" : "Failure!") << std::endl << std::endl;
+    searchForDevices(true);
 }
 
 ProfinetTool::ProfinetTool(const std::string &interface, int timeout) : interface(interface), searchTimeout(timeout) {}
