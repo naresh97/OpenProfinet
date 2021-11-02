@@ -3,6 +3,19 @@
 A collection of tools for configuring Profinet devices on Linux based systems.
 Uses libpcap library for creating Ethernet frames.
 
+## Usage
+
+```
+Search for Profinet devices on the network.
+Usage: pntool search [OPTIONS]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -i,--interface              Interface to use
+  -t,--timeout INT            Time to search for devices in milliseconds
+
+```
+
 ## Building
 
 Uses CMake as build system.
