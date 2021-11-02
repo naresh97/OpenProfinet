@@ -103,7 +103,7 @@ void ProfinetTool::configureDevices(const std::string &deviceName, const std::st
         }
     }
 
-    if(!found) throw std::runtime_error("Device does not exist on network.");
+    if(!found) throw std::runtime_error("Device does not exist on network. Use 'search' to check the name.");
 
     if(!newName.empty()) device.deviceName = newName;
     if(!newIP.empty()) device.ipAddress = newIP;
@@ -119,7 +119,10 @@ void ProfinetTool::configureDevices(const std::string &deviceName, const std::st
     inet_pton(AF_INET, device.gateway.c_str(), &device_p.gateway);
 
     auto success = set_device_configuration(interface.c_str(), &device_p);
-    std::cout << "Device Configuration: " << (success ? "Success!" : "Failure!") << std::endl << std::endl;
+    if(success)
+        std::cout << "Device Configuration: Success!" << std::endl << std::endl;
+    else
+        throw std::runtime_error("Configuration Failure. Did not receive response from the device.");
     searchForDevices(true);
 }
 
