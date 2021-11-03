@@ -26,3 +26,7 @@ https://github.com/naresh97/OpenProfinet
 ")
 set(CPACK_DEBIAN_FILE_NAME OpenProfinet-${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}.${CMAKE_PROJECT_VERSION_PATCH}.deb)
 include(CPack)
+
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+add_subdirectory(docs-src)

@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>OpenProfinet &mdash; OpenProfinet v0.9.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.min.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <a class="site-nav-toggle hidden-lg-up"><i class="icon-menu"></i></a>
+            <a class="site-title" href="#">
+                OpenProfinet
+            </a>
+        </div>
+    </header>
+
+
+<div class="breadcrumbs-outer hidden-xs-down">
+    <div class="container">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="breadcrumbs">
+    
+      <li><a href="#">Docs</a></li>
+        
+      <li>OpenProfinet</li>
+    
+    
+      <li class="breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+</div>
+    </div>
+</div>
+    <div class="main-outer">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-3 site-nav">
+                    
+<div role="search">
+    <form class="search" action="search.html" method="get">
+        <div class="icon-input">
+            <input type="text" name="q" placeholder="Search" />
+            <span class="icon-search"></span>
+        </div>
+        <input type="submit" value="Go" class="d-hidden" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+                    <div class="site-nav-tree">
+                        
+                            
+                            
+                                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">OpenProfinet</a></li>
+<li><a class="reference internal" href="#installing">Installing</a><ul>
+<li><a class="reference internal" href="#building">Building</a><ul>
+<li><a class="reference internal" href="#pre-requisites">Pre-requisites</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#documentation">Documentation</a><ul>
+<li><a class="reference internal" href="#profinettool">ProfinetTool</a></li>
+<li><a class="reference internal" href="#profinetdevice">ProfinetDevice</a></li>
+<li><a class="reference internal" href="#pcap-interface">PCAP Interface</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#licensing">Licensing</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+                            
+                        
+                    </div>
+                </div>
+                <div class="col-12 col-lg-9">
+                    <div class="document">
+                        
+                            
+  <div class="section" id="openprofinet">
+<h1>OpenProfinet<a class="headerlink" href="#openprofinet" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="installing">
+<h1>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h1>
+<p>The latest releases can be obtained on the <a class="reference external" href="https://github.com/naresh97/OpenProfinet/releases">GitHub repository</a> and installed as follows.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> sudo apt install ./OpenProfinet-0.9.2-x86_64.deb
+</pre></div>
+</div>
+<div class="section" id="building">
+<h2>Building<a class="headerlink" href="#building" title="Permalink to this headline">¶</a></h2>
+<p>OpenProfinet is built using CMake. Simply pull the repository, and run CMake in the standard way.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> git clone https://github.com/naresh97/OpenProfinet.git <span class="o">&amp;&amp;</span> <span class="nb">cd</span> ./OpenProfinet
+<span class="gp">$</span> mkdir ./build <span class="o">&amp;&amp;</span> <span class="nb">cd</span> ./build
+<span class="gp">$</span> cmake ..
+<span class="gp">$</span> make
+</pre></div>
+</div>
+<div class="section" id="pre-requisites">
+<h3>Pre-requisites<a class="headerlink" href="#pre-requisites" title="Permalink to this headline">¶</a></h3>
+<p>The following pre-requisites are required for building. Ubuntu/Debian packages are specified, but packages on other
+distributions should be installed in a similar way. Refer to your distribution’s package manager.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> sudo apt install libpcap-dev
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="profinettool">
+<h2>ProfinetTool<a class="headerlink" href="#profinettool" title="Permalink to this headline">¶</a></h2>
+<p>The ProfinetTool class provides a library of tools required for</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv412ProfinetTool">
+<span id="_CPPv312ProfinetTool"></span><span id="_CPPv212ProfinetTool"></span><span id="ProfinetTool"></span><span class="target" id="classProfinetTool"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProfinetTool</span></span></span><a class="headerlink" href="#_CPPv412ProfinetTool" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><a class="reference internal" href="#classProfinetTool"><span class="std std-ref">ProfinetTool</span></a> class contains the methods providing the core functionality of configuring a Profinet network </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12ProfinetTool12ProfinetToolEi">
+<span id="_CPPv3N12ProfinetTool12ProfinetToolEi"></span><span id="_CPPv2N12ProfinetTool12ProfinetToolEi"></span><span id="ProfinetTool::ProfinetTool__i"></span><span class="target" id="classProfinetTool_1a172475ce14e570c3b19114403ba739b7"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProfinetTool</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timeout</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">5000</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12ProfinetTool12ProfinetToolEi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct <a class="reference internal" href="#classProfinetTool"><span class="std std-ref">ProfinetTool</span></a> class using the default interface </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>timeout</strong> – Timeout for searching for devices on network </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12ProfinetTool12ProfinetToolERKNSt6stringEi">
+<span id="_CPPv3N12ProfinetTool12ProfinetToolERKNSt6stringEi"></span><span id="_CPPv2N12ProfinetTool12ProfinetToolERKNSt6stringEi"></span><span id="ProfinetTool::ProfinetTool__ssCR.i"></span><span class="target" id="classProfinetTool_1a56f4c488b75562af518c1e2ec2db3fd5"></span><span class="sig-name descname"><span class="n"><span class="pre">ProfinetTool</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">interface</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timeout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12ProfinetTool12ProfinetToolERKNSt6stringEi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Construct <a class="reference internal" href="#classProfinetTool"><span class="std std-ref">ProfinetTool</span></a> class </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interface</strong> – The interface to use to configure the Profinet netwoork </p></li>
+<li><p><strong>timeout</strong> – Timeout for searching for devices on network </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12ProfinetTool16searchForDevicesEb">
+<span id="_CPPv3N12ProfinetTool16searchForDevicesEb"></span><span id="_CPPv2N12ProfinetTool16searchForDevicesEb"></span><span id="ProfinetTool::searchForDevices__b"></span><span class="target" id="classProfinetTool_1a77cdd0f2862043196e92f3e0881845ed"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv414ProfinetDevice" title="ProfinetDevice"><span class="n"><span class="pre">ProfinetDevice</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">searchForDevices</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">printFoundDevices</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12ProfinetTool16searchForDevicesEb" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Search for devices on the Profinet network </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>printFoundDevices</strong> – Print the devices found to stdout </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A vector of found devices as a vector of type <a class="reference internal" href="#structProfinetDevice"><span class="std std-ref">ProfinetDevice</span></a> </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12ProfinetTool16configureDevicesERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE">
+<span id="_CPPv3N12ProfinetTool16configureDevicesERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="_CPPv2N12ProfinetTool16configureDevicesERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE"></span><span id="ProfinetTool::configureDevices__ssCR.ssCR.ssCR.ssCR.ssCR"></span><span class="target" id="classProfinetTool_1a89f000e0da25b5b5d73f44f64a5e6999"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">configureDevices</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">deviceName</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">newName</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">newIP</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">newSubnet</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">newGateway</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12ProfinetTool16configureDevicesERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringERKNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Configure a device on the Profinet network</p>
+<p>Leave parameter blank ( empty string or std::string() ) if parameter should not be changed</p>
+<p>WARNING: Might fail if Subnet/Gateway settings do not match IP (bad response from device)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>deviceName</strong> – The station name of the device to configure </p></li>
+<li><p><strong>newName</strong> – The new station name of the device </p></li>
+<li><p><strong>newIP</strong> – The new IP address of the device </p></li>
+<li><p><strong>newSubnet</strong> – The new subnet mask of the device </p></li>
+<li><p><strong>newGateway</strong> – The new gateway IP address of the device </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="profinetdevice">
+<h2>ProfinetDevice<a class="headerlink" href="#profinetdevice" title="Permalink to this headline">¶</a></h2>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv414ProfinetDevice">
+<span id="_CPPv314ProfinetDevice"></span><span id="_CPPv214ProfinetDevice"></span><span id="ProfinetDevice"></span><span class="target" id="structProfinetDevice"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProfinetDevice</span></span></span><a class="headerlink" href="#_CPPv414ProfinetDevice" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><a class="reference internal" href="#structProfinetDevice"><span class="std std-ref">ProfinetDevice</span></a> models the parameters for a Profinet device </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14ProfinetDevice10deviceNameE">
+<span id="_CPPv3N14ProfinetDevice10deviceNameE"></span><span id="_CPPv2N14ProfinetDevice10deviceNameE"></span><span id="ProfinetDevice::deviceName__ss"></span><span class="target" id="structProfinetDevice_1ae2ba2abb91dce6ce78eba6aeb832f3f5"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deviceName</span></span></span><a class="headerlink" href="#_CPPv4N14ProfinetDevice10deviceNameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14ProfinetDevice10deviceTypeE">
+<span id="_CPPv3N14ProfinetDevice10deviceTypeE"></span><span id="_CPPv2N14ProfinetDevice10deviceTypeE"></span><span id="ProfinetDevice::deviceType__ss"></span><span class="target" id="structProfinetDevice_1a765d7a13e99cf198bef0660da8fd0e6d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deviceType</span></span></span><a class="headerlink" href="#_CPPv4N14ProfinetDevice10deviceTypeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14ProfinetDevice9ipAddressE">
+<span id="_CPPv3N14ProfinetDevice9ipAddressE"></span><span id="_CPPv2N14ProfinetDevice9ipAddressE"></span><span id="ProfinetDevice::ipAddress__ss"></span><span class="target" id="structProfinetDevice_1a686c1652da96901b67429fb994e8bfa9"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ipAddress</span></span></span><a class="headerlink" href="#_CPPv4N14ProfinetDevice9ipAddressE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14ProfinetDevice10subnetMaskE">
+<span id="_CPPv3N14ProfinetDevice10subnetMaskE"></span><span id="_CPPv2N14ProfinetDevice10subnetMaskE"></span><span id="ProfinetDevice::subnetMask__ss"></span><span class="target" id="structProfinetDevice_1ac4dbb51788105e6d2b1fa0c6a518ae13"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">subnetMask</span></span></span><a class="headerlink" href="#_CPPv4N14ProfinetDevice10subnetMaskE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14ProfinetDevice7gatewayE">
+<span id="_CPPv3N14ProfinetDevice7gatewayE"></span><span id="_CPPv2N14ProfinetDevice7gatewayE"></span><span id="ProfinetDevice::gateway__ss"></span><span class="target" id="structProfinetDevice_1ac5f92564f53d4fcb5b2598cdc8185bc0"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gateway</span></span></span><a class="headerlink" href="#_CPPv4N14ProfinetDevice7gatewayE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14ProfinetDevice9deviceMACE">
+<span id="_CPPv3N14ProfinetDevice9deviceMACE"></span><span id="_CPPv2N14ProfinetDevice9deviceMACE"></span><span id="ProfinetDevice::deviceMAC__std::array:uint8_t.6:"></span><span class="target" id="structProfinetDevice_1a5ca200deaa5a51721242c5da26f41bc6"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">6</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deviceMAC</span></span></span><a class="headerlink" href="#_CPPv4N14ProfinetDevice9deviceMACE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="pcap-interface">
+<h2>PCAP Interface<a class="headerlink" href="#pcap-interface" title="Permalink to this headline">¶</a></h2>
+<p>The PCAP Interface specified in pcapInterface.h provides the a C-based interface to the libpcap library.
+Here, we listen, build and send packets to a specified interface, as well as process incoming packets on the
+byte level.</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.PROFINET_DEVICE_LIST_SIZE">
+<span class="target" id="pcapInterface_8h_1a3486f4db1fb78441c7468ea45a944e3a"></span><span class="sig-name descname"><span class="n"><span class="pre">PROFINET_DEVICE_LIST_SIZE</span></span></span><a class="headerlink" href="#c.PROFINET_DEVICE_LIST_SIZE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Defines buffer size for number of Profinet devices on the network </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421get_default_interfacePc">
+<span id="_CPPv321get_default_interfacePc"></span><span id="_CPPv221get_default_interfacePc"></span><span id="get_default_interface__cP"></span><span class="target" id="pcapInterface_8h_1a79efd56b441ac03c6e93243f9d962c5d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_default_interface</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">interface</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421get_default_interfacePc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Gets the default network interface on the machine </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>interface</strong> – Pointer of char array to output interface </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417discovery_requestA_Kc">
+<span id="_CPPv317discovery_requestA_Kc"></span><span id="_CPPv217discovery_requestA_Kc"></span><span id="discovery_request__cCA"></span><span class="target" id="pcapInterface_8h_1a00aa7157555f8d9210038b5a595a8c36"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">discovery_request</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">interface</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417discovery_requestA_Kc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Create a multicast Profinet-DCP discovery request. Profinet devices on the network will respond to this request. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>interface</strong> – Interface to broadcast request on </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415profinet_listenA_KcP21profinet_packet_arrayi">
+<span id="_CPPv315profinet_listenA_KcP21profinet_packet_arrayi"></span><span id="_CPPv215profinet_listenA_KcP21profinet_packet_arrayi"></span><span id="profinet_listen__cCA.profinet_packet_arrayP.i"></span><span class="target" id="pcapInterface_8h_1a37b3bfd271111eea6d9a1e3d186c3448"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">profinet_listen</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">interface</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">profinet_packet_array</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">profinetPacketArray</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timeout</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415profinet_listenA_KcP21profinet_packet_arrayi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Listen for Profinet packets </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interface</strong> – Interface to listen on </p></li>
+<li><p><strong>profinetPacketArray</strong> – Pointer to array of Profinet packets to output to </p></li>
+<li><p><strong>timeout</strong> – Listen timeout in seconds </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420get_profinet_devicesP21profinet_packet_arrayP15profinet_devicePi">
+<span id="_CPPv320get_profinet_devicesP21profinet_packet_arrayP15profinet_devicePi"></span><span id="_CPPv220get_profinet_devicesP21profinet_packet_arrayP15profinet_devicePi"></span><span id="get_profinet_devices__profinet_packet_arrayP.profinet_deviceP.iP"></span><span class="target" id="pcapInterface_8h_1a6908cd39d874b2bb566db33a3cf370d4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_profinet_devices</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">profinet_packet_array</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">profinetPacketArray</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">profinet_device</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">profinetDevices</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420get_profinet_devicesP21profinet_packet_arrayP15profinet_devicePi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Gets discovery responses from a provided array of Profinet packets </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>profinetPacketArray</strong> – Pointer to array of packets to search </p></li>
+<li><p><strong>profinetDevices</strong> – Pointer to array of Profinet devices to output to </p></li>
+<li><p><strong>count</strong> – Pointer to integer of number of Profinet devices found to output to </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424set_device_configurationPKcP15profinet_device">
+<span id="_CPPv324set_device_configurationPKcP15profinet_device"></span><span id="_CPPv224set_device_configurationPKcP15profinet_device"></span><span id="set_device_configuration__cCP.profinet_deviceP"></span><span class="target" id="pcapInterface_8h_1a0278f9327fe3c2e50a2a0b24c0ec00f5"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_device_configuration</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">interface</span></span>, <span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">profinet_device</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">device</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424set_device_configurationPKcP15profinet_device" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Sends a request to a device, requesting it to configure itself to the given parameters </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interface</strong> – Interface, over which to send configuration request </p></li>
+<li><p><strong>device</strong> – Pointer to the Profinet device to send request to </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether the device has acknowledged the configuration request </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+<div class="section" id="licensing">
+<h1>Licensing<a class="headerlink" href="#licensing" title="Permalink to this headline">¶</a></h1>
+<p>The source code and binaries of this project use the GPLv3 license for <strong>non-commercial</strong> uses only!</p>
+<p>If you would like to use any part of the OpenProfinet project for commercial purposes, you must obtain
+explicit permission from the <a class="reference external" href="https://nareshkumarrao.com/contact/">author</a>.</p>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'v0.9.2',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+    <div class="footer" role="contentinfo">
+        <div class="container">
+            &#169; Copyright 2021, Nareshkumar Rao.
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.0.1.
+        </div>
+    </div>  
+
+</body>
+</html>
