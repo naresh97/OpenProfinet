@@ -3,6 +3,8 @@
 A collection of tools for configuring Profinet devices on Linux based systems.
 Uses libpcap library for creating Ethernet frames.
 
+[View OpenProfinet Documentation on Github Pages](https://naresh97.github.io/OpenProfinet/)
+
 ## Usage: pntool
 
 ### pntool search
