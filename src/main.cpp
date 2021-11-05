@@ -12,12 +12,12 @@ int main(int argc, char **argv) {
     search->add_option("-t,--timeout", timeout, "Time to search for devices in milliseconds");
 
     CLI::App *configure = app.add_subcommand("configure", "Configure Profinet devices on the network.");
-    CLI::Option *device = configure->add_option("device", "The current name of the device to configure")
+    CLI::Option *device = configure->add_option("device", "The current name of the device to configure. Use EMPTY for blank string.")
             ->required(true);
     configure->add_option("-t,--timeout", timeout, "Time to search for devices in milliseconds");
 
     std::string newName;
-    configure->add_option("-n,--name", newName, "Set a new name for the device");
+    configure->add_option("-n,--name", newName, "Set a new name for the device. Use EMPTY for blank string.");
 
     std::string newIP;
     configure->add_option("-i,--ip", newIP, "New IP Address");
@@ -28,6 +28,9 @@ int main(int argc, char **argv) {
 
     CLI11_PARSE(app, argc, argv);
 
+    auto deviceName = device->as<std::string>();
+    if(deviceName == "EMPTY") deviceName = "";
+
     try {
         if (*search) {
             ProfinetTool profinetTool(timeout);
@@ -35,7 +38,7 @@ int main(int argc, char **argv) {
             profinetTool.searchForDevices();
         } else if (*configure) {
             ProfinetTool profinetTool(timeout);
-            profinetTool.configureDevices(device->as<std::string>(), newName, newIP, newSubnet,
+            profinetTool.configureDevices(deviceName, newName, newIP, newSubnet,
                                           newGateway);
         }
     } catch (const std::runtime_error &e) {
