@@ -82,7 +82,7 @@ std::vector<ProfinetDevice> ProfinetTool::searchForDevices(bool printFoundDevice
     if (printFoundDevices) {
         for (const auto &device: devices) {
             using namespace std;
-            cout << "Device Name: " << device.deviceName << " - IP: " << device.ipAddress << ", Subnet Mask: "
+            cout << "Device Name: " << (device.deviceName.empty() ? "<EMPTY>" : device.deviceName) << " - IP: " << device.ipAddress << ", Subnet Mask: "
                  << device.subnetMask
                  << ", Gateway: " << device.gateway << ", Type: " << device.deviceType << endl;
         }

@@ -310,7 +310,7 @@ void set_device_name_block(const char interface[], struct profinet_device *devic
     };
     uint16_t nameBlockLength = htons(strlen(device->deviceName) + 2);
     memcpy(namePreBlock + 2, &nameBlockLength, 2);
-    memset(namePreBlock + 4, 0x0000, 1);
+    memset(namePreBlock + 4, 0x0001, 1);
     memcpy(nameBlock, namePreBlock, 6);
     memcpy(nameBlock + 6, device->deviceName, strlen(device->deviceName));
     memset(nameBlock + 6 + strlen(device->deviceName), 0, 1);
